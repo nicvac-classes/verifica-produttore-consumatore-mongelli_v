@@ -24,17 +24,36 @@ class ProduttoreThread(threading.Thread):
     def __init__(self, idx):
         super().__init__()
         self.idx = idx
-
-    # DA IMPLEMENTARE (run)
-
+        self.dato = idx * 100 + 1
+    def run(self):
+        global metti
+        while (true):
+            vuoto.acquire()
+            mutexP.acquire()
+            i_metti= metti
+            metti = (metti + 1) %DIM_BUFFER
+            mutexP.release()
+            buffer[i_metti]=self.dato
+            print(f"PROD-{self.idx}) prodotto{self.dato} in buffer [i_metti]"
+            self.dato += 1
+            pieno.release()
+            
 
 class ConsumatoreThread(threading.Thread):
     def __init__(self, idx):
         super().__init__()
         self.idx = idx
-
-    # DA IMPLEMENTARE (run)
-
+        def run(self):
+            global togli
+            while true:
+                pieno.acquire()
+                mutexC.acquire()
+                i_togli = togli
+                togli = (togli + 1) %DIM_BUFFER
+                mutexC.release()
+                dato= buffer[i_togli]
+                print(f"CONS-{self.idx}) consumato {dato} da buffer[{i_togli}]
+                vuoto.release()
 
 def main():
     global metti
@@ -42,18 +61,28 @@ def main():
     produttori = [ProduttoreThread(i + 1) for i in range(N_PRODUTTORI)]
     consumatori = [ConsumatoreThread(i + 1) for i in range(N_CONSUMATORI)]
 
-    # DA IMPLEMENTARE: start dei thread produttori e consumatori
-
-    # DA IMPLEMENTARE: join di tutti i produttori
-
+    for c in consumatori:
+        p.start()
+    for p in produttori:
+        p.start()
+    for p in produttori:
+        p.join()
     print("Tutti i canali hanno terminato. Chiusura addetti...")
-
-    # Invia un messaggio None per ogni addetto.
+    for _ in range(N_CONSUMATORI)
+    vuoto.acquire()
+    buffer[metti] = None
+    metti = (metti + 1) %DIM_BUFFER
+    pieno.release()
+    for c in consumatori:
+        c.join()
     for _ in range(N_CONSUMATORI):
-        # DA IMPLEMENTARE: inserire None nel buffer
+            vuoto.acquire()
+    buffer[metti] = None
+    metti = (metti + 1) %DIM_BUFFER
+    pieno.release()
+    for c in consumatori:
+        c.join()
         pass
-
-    # DA IMPLEMENTARE: join di tutti i consumatori
 
     print("Magazzino chiuso.")
 
